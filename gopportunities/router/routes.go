@@ -6,6 +6,7 @@ import (
 )
 
 func initializeRoutes(router *chi.Mux) {
+	handler.InitializeHandler()
 	router.Route("/api/v1", func(r chi.Router) {
 		r.Get("/opening", handler.ShowOpeningHandler)
 		r.Post("/opening", handler.CreateOpeningHandler)

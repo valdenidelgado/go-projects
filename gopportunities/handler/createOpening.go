@@ -1,11 +1,38 @@
 package handler
 
 import (
-	"github.com/go-chi/render"
+	"encoding/json"
+	"github.com/valdenidelgado/go-projects/gopportunities/schemas"
 	"net/http"
 )
 
 func CreateOpeningHandler(w http.ResponseWriter, r *http.Request) {
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, map[string]string{"msg": "hello"})
+	request := CreateOpeningRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		sendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := request.Validate(); err != nil {
+		logger.Errorf("Error validating request: %v", err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	opening := schemas.Opening{
+		Role:     request.Role,
+		Company:  request.Company,
+		Location: request.Location,
+		Link:     request.Link,
+		Remote:   *request.Remote,
+		Salary:   request.Salary,
+	}
+
+	if err := db.Create(&opening).Error; err != nil {
+		logger.Errorf("Error creating request: %v", err)
+		sendError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	sendSuccess(w, opening)
+	//json.NewEncoder(w).Encode(request)
 }
