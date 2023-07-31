@@ -34,5 +34,4 @@ func CreateOpeningHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendSuccess(w, opening)
-	//json.NewEncoder(w).Encode(request)
 }
