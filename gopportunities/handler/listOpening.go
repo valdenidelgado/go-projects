@@ -1,12 +1,16 @@
 package handler
 
 import (
-	"github.com/go-chi/render"
+	"github.com/valdenidelgado/go-projects/gopportunities/schemas"
 	"net/http"
 )
 
 func ListOpeningHandler(w http.ResponseWriter, r *http.Request) {
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, map[string]string{"msg": "hello"})
+	var openings []schemas.Opening
+	if err := db.Find(&openings).Error; err != nil {
+		sendError(w, http.StatusInternalServerError, "error listing openings")
+		return
+	}
 
+	sendSuccess(w, openings)
 }
