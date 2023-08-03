@@ -8,8 +8,8 @@ import (
 )
 
 func (u *UserDomain) CreateUser() *rest_err.RestErr {
-	logger.Info("Creating a new user", zap.String("journey", "createUser"))
+	logger.Info("Creating a new user model", zap.String("journey", "createUser"))
 	u.EncryptPassword()
 	fmt.Println(u)
-	panic("implement me")
+	return nil
 }

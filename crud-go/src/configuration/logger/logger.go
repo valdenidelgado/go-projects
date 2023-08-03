@@ -34,7 +34,7 @@ func init() {
 func Info(message string, tags ...zap.Field) {
 	log.Info(message, tags...)
 	if err := log.Sync(); err != nil {
-		panic(err)
+		return
 	}
 }
 
@@ -42,7 +42,7 @@ func Error(message string, err error, tags ...zap.Field) {
 	tags = append(tags, zap.NamedError("error", err))
 	log.Info(message, tags...)
 	if err := log.Sync(); err != nil {
-		panic(err)
+		return
 	}
 }
 
