@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/logger"
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/rest_err"
 	"github.com/valdenidelgado/go-projects/crud-go/src/model"
@@ -13,6 +12,5 @@ func (u *userDomainService) CreateUser(
 ) *rest_err.RestErr {
 	logger.Info("Creating a new user model", zap.String("journey", "createUser"))
 	userDomain.EncryptPassword()
-	fmt.Println(u)
 	return nil
 }
