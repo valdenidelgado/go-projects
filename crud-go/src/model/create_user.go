@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (u *UserDomain) CreateUser() *rest_err.RestErr {
+func (u *userDomain) CreateUser() *rest_err.RestErr {
 	logger.Info("Creating a new user model", zap.String("journey", "createUser"))
 	u.EncryptPassword()
 	fmt.Println(u)

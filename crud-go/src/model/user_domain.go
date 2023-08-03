@@ -6,34 +6,34 @@ import (
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/rest_err"
 )
 
-type UserDomain struct {
-	Email    string
-	Name     string
-	Age      int8
-	Password string
+type userDomain struct {
+	email    string
+	name     string
+	age      int8
+	password string
 }
 
 func NewUserDomain(
 	email, password, name string, age int8,
 ) UserDomainInterface {
-	return &UserDomain{
-		Email:    email,
-		Name:     name,
-		Age:      age,
-		Password: password,
+	return &userDomain{
+		email:    email,
+		name:     name,
+		age:      age,
+		password: password,
 	}
 }
 
-func (u *UserDomain) EncryptPassword() {
+func (u *userDomain) EncryptPassword() {
 	hash := md5.New()
 	defer hash.Reset()
-	hash.Write([]byte(u.Password))
-	u.Password = hex.EncodeToString(hash.Sum(nil))
+	hash.Write([]byte(u.password))
+	u.password = hex.EncodeToString(hash.Sum(nil))
 }
 
 type UserDomainInterface interface {
 	CreateUser() *rest_err.RestErr
 	UpdateUser(string) *rest_err.RestErr
-	FindUser(string) (*UserDomain, *rest_err.RestErr)
+	FindUser(string) (*userDomain, *rest_err.RestErr)
 	DeleteUser(string) *rest_err.RestErr
 }
