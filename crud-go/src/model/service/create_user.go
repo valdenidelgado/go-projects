@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (u *userDomainService) CreateUser(
+func (u *userDomainService) CreateUserServices(
 	userDomain model.UserDomainInterface,
 ) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Creating a new user model", zap.String("journey", "createUser"))
