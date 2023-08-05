@@ -5,29 +5,35 @@ import (
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/logger"
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/rest_err"
 	"github.com/valdenidelgado/go-projects/crud-go/src/model"
+	"github.com/valdenidelgado/go-projects/crud-go/src/model/repository/entity/converter"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/zap"
 	"os"
 )
 
 var (
-	MONGO_COLLECTION_NAME = "MONGO_COLLECTION_NAME"
+	MONGODB_USER_COLLECTION = "MONGODB_USER_COLLECTION"
 )
 
 func (r *userRepository) CreateUser(userDomain model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
-	logger.Info("Init CreateUser repository")
+	logger.Info("Init CreateUser repository", zap.String("journey", "CreateUser"))
 
-	collection_name := os.Getenv(MONGO_COLLECTION_NAME)
+	collection_name := os.Getenv(MONGODB_USER_COLLECTION)
 	collection := r.databaseConnection.Collection(collection_name)
 
-	value, err := userDomain.GetJSONValue()
-	if err != nil {
-		return nil, rest_err.NewInternalServerError(err.Error())
-	}
+	value := converter.ConvertDomainToEntity(userDomain)
 	result, err := collection.InsertOne(context.Background(), value)
 	if err != nil {
+		logger.Error("Error trying to call CreateUser", err,
+			zap.String("journey", "CreateUser"))
 		return nil, rest_err.NewInternalServerError(err.Error())
 	}
 
-	userDomain.SetID(result.InsertedID.(string))
+	value.ID = result.InsertedID.(primitive.ObjectID)
 
-	return userDomain, nil
+	logger.Info("CreateUser repository successfully",
+		zap.String("id", value.ID.Hex()),
+		zap.String("journey", "CreateUser"))
+
+	return converter.ConvertEntityToDomain(value), nil
 }
