@@ -11,10 +11,6 @@ import (
 	"os"
 )
 
-var (
-	MONGODB_USER_COLLECTION = "MONGODB_USER_COLLECTION"
-)
-
 func (r *userRepository) CreateUser(userDomain model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init CreateUser repository", zap.String("journey", "CreateUser"))
 
