@@ -16,11 +16,11 @@ import (
 	"os"
 )
 
-func (ur *userRepository) FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (r *userRepository) FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByEmail repository", zap.String("journey", "FindUserByEmail"))
 
 	collection_name := os.Getenv(MONGODB_USER_COLLECTION)
-	collection := ur.databaseConnection.Collection(collection_name)
+	collection := r.databaseConnection.Collection(collection_name)
 
 	userEntity := &entity.UserEntity{}
 
@@ -45,11 +45,11 @@ func (ur *userRepository) FindUserByEmail(email string) (model.UserDomainInterfa
 	return converter.ConvertEntityToDomain(userEntity), nil
 }
 
-func (ur *userRepository) FindUserByID(id string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (r *userRepository) FindUserByID(id string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByID repository", zap.String("journey", "FindUserByID"))
 
 	collection_name := os.Getenv(MONGODB_USER_COLLECTION)
-	collection := ur.databaseConnection.Collection(collection_name)
+	collection := r.databaseConnection.Collection(collection_name)
 
 	userEntity := &entity.UserEntity{}
 
