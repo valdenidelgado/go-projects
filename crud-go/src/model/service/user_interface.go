@@ -18,6 +18,7 @@ type userDomainService struct {
 
 type UserDomainService interface {
 	CreateUserServices(domainInterface model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr)
+	LoginUserServices(domainInterface model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr)
 	UpdateUser(string, model.UserDomainInterface) *rest_err.RestErr
 	FindUserByEmailServices(email string) (model.UserDomainInterface, *rest_err.RestErr)
 	FindUserByIDServices(id string) (model.UserDomainInterface, *rest_err.RestErr)
