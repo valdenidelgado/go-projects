@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/logger"
 	"github.com/valdenidelgado/go-projects/crud-go/src/configuration/validation"
@@ -8,7 +10,6 @@ import (
 	"github.com/valdenidelgado/go-projects/crud-go/src/model"
 	"github.com/valdenidelgado/go-projects/crud-go/src/view"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func (uc *userControllerInterface) CreateUser(c *gin.Context) {
