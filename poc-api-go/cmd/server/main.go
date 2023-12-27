@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	configs, err := configs.LoadConfig(".")
+	conf, err := configs.LoadConfig(".")
 	if err != nil {
 		panic(err)
 	}
@@ -29,12 +29,12 @@ func main() {
 	productHandler := handlers.NewProductHandler(productDB)
 
 	userDB := database.NewUser(db)
-	userHandler := handlers.NewUserHandler(userDB, configs.TokenAuth, configs.JwtExpiresIn)
+	userHandler := handlers.NewUserHandler(userDB, conf.TokenAuth, conf.JwtExpiresIn)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Route("/", func(r chi.Router) {
-		r.Use(jwtauth.Verifier(configs.TokenAuth))
+		r.Use(jwtauth.Verifier(conf.TokenAuth))
 		r.Use(jwtauth.Authenticator)
 		r.Post("/", productHandler.CreateProduct)
 		r.Get("/{id}", productHandler.GetProduct)

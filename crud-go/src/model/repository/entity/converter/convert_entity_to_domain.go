@@ -5,9 +5,7 @@ import (
 	"github.com/valdenidelgado/go-projects/crud-go/src/model/repository/entity"
 )
 
-func ConvertEntityToDomain(
-	entity *entity.UserEntity,
-) model.UserDomainInterface {
+func ConvertEntityToDomain(entity *entity.UserEntity) model.UserDomainInterface {
 	domain := model.NewUserDomain(
 		entity.Email,
 		entity.Password,
