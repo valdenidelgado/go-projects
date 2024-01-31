@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -26,10 +25,26 @@ func (uc *UserController) Index(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Welcome to the User Controller"))
 }
 
+func (uc *UserController) ShowOne(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	if err := uc.db.First(&user, id).Error; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
 func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -46,74 +61,106 @@ func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = uc.db.Create(&user).Error
-	if err != nil {
+	if err := uc.db.Create(&user).Error; err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("User created"))
 }
 
 func (uc *UserController) Show(w http.ResponseWriter, r *http.Request) {
-	// show user
+	var user []models.User
+
+	if err := uc.db.Find(&user).Error; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
 }
 
 func (uc *UserController) Update(w http.ResponseWriter, r *http.Request) {
-	//get id from url
 	id := chi.URLParam(r, "id")
-
-	fmt.Println(id)
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	//find user
-	var userModel models.User
-
-	if err := uc.db.First(&userModel, id).Error; err != nil {
+	var user models.User
+	if err := uc.db.First(&user, id).Error; err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println(userModel)
-
-	// update user
-	var user models.UserDTO
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
+	var userDTO models.UserDTO
+	if err := json.NewDecoder(r.Body).Decode(&userDTO); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var userWithUpdatedEmail models.User
+	if err := uc.db.Where("email = ?", userDTO.Email).First(&userWithUpdatedEmail).Error; err != gorm.ErrRecordNotFound {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Email already exists"))
+		return
+	}
+
+	if userWithUpdatedEmail.Id != user.Id {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Email already exists"))
 		return
 	}
 
 	if user.Name != "" {
-		userModel.Name = user.Name
+		user.Name = userDTO.Name
 	}
-
 	if user.Email != "" {
-		userModel.Email = user.Email
+		user.Email = userDTO.Email
 	}
 	if user.Avatar != "" {
-		userModel.Avatar = user.Avatar
+		user.Avatar = userDTO.Avatar
 	}
-	if user.Password != "" && user.OldPassword != "" {
-		compare := bcrypt.CompareHashAndPassword([]byte(userModel.Password), []byte(user.OldPassword))
+
+	if userDTO.Password != "" && userDTO.OldPassword != "" {
+		compare := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userDTO.OldPassword))
 		if compare != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Old password does not match"))
 			return
 		}
 		passwordHash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		userModel.Password = string(passwordHash)
+		user.Password = string(passwordHash)
 	}
 
-	err = uc.db.Save(&userModel).Error
-	if err != nil {
+	if err := uc.db.Save(&user).Error; err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User updated"))
+}
 
+func (uc *UserController) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	if err := uc.db.First(&user, id).Error; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := uc.db.Delete(&user).Error; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

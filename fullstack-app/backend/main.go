@@ -24,13 +24,11 @@ func main() {
 
 	uc := controllers.NewUserController(db)
 
-	router.Get("/", uc.Index)
+	router.Get("/users", uc.Show)
+	router.Get("/users/{id}", uc.ShowOne)
 	router.Post("/users", uc.Create)
 	router.Patch("/users/{id}", uc.Update)
-	// router.Patch("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
-	// 	id := chi.URLParam(r, "id")
-	// 	fmt.Println(id)
-	// })
+	router.Delete("/users/{id}", uc.Delete)
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", router)
